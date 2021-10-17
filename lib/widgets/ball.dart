@@ -13,6 +13,7 @@ class Ball extends StatelessWidget {
       alignment: Alignment(x, y),
       child: Container(
         height: 20,
+        width: 20,
         decoration: const BoxDecoration(
           shape: BoxShape.circle,
           color: CupertinoColors.black,
