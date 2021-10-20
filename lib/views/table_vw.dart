@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:pp_lightning/helpers/helpers.dart';
 import 'package:pp_lightning/widgets/ball.dart';
 import 'package:pp_lightning/widgets/racket.dart';
+import 'package:pp_lightning/widgets/score_board.dart';
 
 class TableVw extends StatefulWidget {
   const TableVw({Key? key}) : super(key: key);
@@ -15,8 +16,9 @@ class TableVw extends StatefulWidget {
 }
 
 class _TableVwState extends State<TableVw> {
-  bool gameRunning = false;
   late final MotionEngine me;
+  int pointsRacketUp = 0;
+  int pointsRacketDown = 0;
 
   @override
   void initState() {
@@ -25,14 +27,39 @@ class _TableVwState extends State<TableVw> {
     startGame();
   }
 
-  void startGame() {
-    gameRunning = true;
-    setState(() {
-      me.setRandomBallDirection();
-    });
+  void endGame(Timer timer) {
+    timer.cancel();
+    pointsRacketDown = 0;
+    pointsRacketUp = 0;
+    me.racketDownX = -0.2;
+    me.racketUpX = -0.2;
+    me.resetBallPosition();
+  }
 
-    Timer.periodic(const Duration(milliseconds: 1), (timer) {
+  void throwBall() async {
+    await Future.delayed(const Duration(seconds: 1));
+    me.setRandomBallDirection();
+  }
+
+  void startGame() {
+    throwBall();
+
+    Timer.periodic(const Duration(milliseconds: 10), (timer) {
       setState(() {
+        if (me.ballPassedRacket()) {
+          if (me.ballDirectionVertical == Direction.down) {
+            pointsRacketDown += 1;
+          } else {
+            pointsRacketUp += 1;
+          }
+
+          if (pointsRacketUp > 4 || pointsRacketDown > 4) {
+            endGame(timer);
+          } else {
+            me.resetBallPosition();
+          }
+        }
+
         me.moveBall();
       });
     });
@@ -69,12 +96,18 @@ class _TableVwState extends State<TableVw> {
                 me.moveRacketUpRight();
               });
             }
+
+            if (ev.isKeyPressed(LogicalKeyboardKey.space)) {
+              startGame();
+            }
           },
           child: Stack(
             children: [
-              Racket(x: me.racketUpX, y: me.racketUpY),
+              ScoreBoard(points: pointsRacketUp, alignment: const Alignment(-0.8, -0.8), fontSize: 35),
+              Racket(x: me.racketUpX, y: me.racketUpY, width: me.racketWidth),
               Ball(x: me.ballX, y: me.ballY),
-              Racket(x: me.racketDownX, y: me.racketDownY),
+              Racket(x: me.racketDownX, y: me.racketDownY, width: me.racketWidth),
+              ScoreBoard(points: pointsRacketDown, alignment: const Alignment(0.8, 0.8), fontSize: 35),
             ],
           ),
         ),

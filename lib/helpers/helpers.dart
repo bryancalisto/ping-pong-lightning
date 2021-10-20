@@ -8,16 +8,19 @@ enum Direction {
 }
 
 class MotionEngine {
-  late Direction _ballDirection;
+  late Direction ballDirectionVertical = Direction.down;
+  late Direction ballDirectionHorizontal = Direction.left;
   double ballX = 0;
   double ballY = 0;
-  double racketUpX = 0;
+  // ball width is 20 DP. Converted to aligment
+  double ballDiameter = 0.02;
+  double racketUpX = -0.2;
   double racketUpY = -0.9;
-  double racketDownX = 0;
+  double racketDownX = -0.2;
   double racketDownY = 0.9;
-  // total width is 2 (according to aligment). 5 is the factor we are using using to divide screen in widget.
+  // total width is 2 (according to Aligment class measurements). 5 is the factor we are using using to divide screen in widget.
   // 2/5 = 0.4 in Aligment terms
-  double racketWidth = 0.4;
+  final double racketWidth = 0.4;
   static const xAxisMovementCompensation = 0.1;
 
   void resetBallPosition() {
@@ -26,55 +29,68 @@ class MotionEngine {
   }
 
   void setRandomBallDirection() {
-    _ballDirection = Random().nextInt(2) % 2 == 0 ? Direction.down : Direction.up;
+    ballDirectionVertical = Random.secure().nextInt(2) % 2 == 0 ? Direction.down : Direction.up;
+    ballDirectionHorizontal = Random.secure().nextInt(2) % 2 == 0 ? Direction.left : Direction.right;
   }
 
   void moveBall() {
     if (ballY <= racketUpY && ballX >= racketUpX && ballX <= racketUpX + racketWidth) {
-      _ballDirection = Direction.down;
+      ballDirectionVertical = Direction.down;
     }
 
     if (ballY >= racketDownY && ballX >= racketDownX && ballX <= racketDownX + racketWidth) {
-      _ballDirection = Direction.up;
+      ballDirectionVertical = Direction.up;
     }
 
-    switch (_ballDirection) {
-      case Direction.left:
-        ballX -= 0.01;
-        break;
-      case Direction.right:
-        ballX += 0.01;
-        break;
-      case Direction.up:
-        ballY -= 0.01;
-        break;
-      case Direction.down:
-        ballY += 0.01;
-        break;
+    // Alternate LEFT/RIGHT direction according to walls position
+    if (ballX <= -1) {
+      ballDirectionHorizontal = Direction.right;
+    }
+
+    if (ballX >= 1) {
+      ballDirectionHorizontal = Direction.left;
+    }
+
+    // Vertical
+    if (ballDirectionVertical == Direction.up) {
+      ballY -= 0.01;
+    } else if (ballDirectionVertical == Direction.down) {
+      ballY += 0.01;
+    }
+
+    // Horizontal
+    if (ballDirectionHorizontal == Direction.left) {
+      ballX -= 0.01;
+    } else if (ballDirectionHorizontal == Direction.right) {
+      ballX += 0.01;
     }
   }
 
+  bool ballPassedRacket() {
+    return ballY < -1 || ballY > 1;
+  }
+
   void moveRacketUpLeft() {
-    if (racketUpX > -1) {
-      racketUpX -= 0.05;
+    if (racketUpX >= -0.9) {
+      racketUpX -= 0.1;
     }
   }
 
   void moveRacketUpRight() {
-    if (racketUpX < 1) {
-      racketUpX += 0.05;
+    if (racketUpX < 1 - racketWidth) {
+      racketUpX += 0.1;
     }
   }
 
   void moveRacketDownLeft() {
-    if (racketDownX > -1) {
-      racketDownX -= 0.05;
+    if (racketDownX >= -0.9) {
+      racketDownX -= 0.1;
     }
   }
 
   void moveRacketDownRight() {
-    if (racketDownX < 1) {
-      racketDownX += 0.05;
+    if (racketDownX < 1 - racketWidth) {
+      racketDownX += 0.1;
     }
   }
 }
