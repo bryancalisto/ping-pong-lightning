@@ -24,9 +24,9 @@ class _TableVwState extends State<TableVw> {
   // ball width is 20 DP. Converted to aligment
   // final double _ballDiameter = 0.02;
   double _racketUpX = -0.2;
-  final double _racketUpY = -0.9;
+  final double _racketUpY = -0.95;
   double racketDownX = -0.2;
-  final double _racketDownY = 0.9;
+  final double _racketDownY = 0.95;
   // total width is 2 (according to Aligment class measurements). 5 is the factor we are using using to divide screen in widget.
   // 2/5 = 0.4 in Aligment terms
   final double _racketWidth = 0.4;
@@ -46,35 +46,34 @@ class _TableVwState extends State<TableVw> {
   }
 
   void moveBall() {
+    // Toggle vertical direction
     if (_ballY <= _racketUpY && _ballX >= _racketUpX && _ballX <= _racketUpX + _racketWidth) {
       _ballDirectionVertical = Direction.down;
-    }
-
-    if (_ballY >= _racketDownY && _ballX >= racketDownX && _ballX <= racketDownX + _racketWidth) {
+    } else if (_ballY >= _racketDownY && _ballX >= racketDownX && _ballX <= racketDownX + _racketWidth) {
       _ballDirectionVertical = Direction.up;
     }
 
     // Alternate LEFT/RIGHT direction according to walls position
     if (_ballX <= -1) {
       _ballDirectionHorizontal = Direction.right;
-    }
-
-    if (_ballX >= 1) {
+    } else if (_ballX >= 1) {
       _ballDirectionHorizontal = Direction.left;
     }
 
     // Vertical
     if (_ballDirectionVertical == Direction.up) {
-      _ballY -= 0.02;
-    } else if (_ballDirectionVertical == Direction.down) {
-      _ballY += 0.02;
+      _ballY -= 0.01;
+    } else {
+      // down
+      _ballY += 0.01;
     }
 
     // Horizontal
     if (_ballDirectionHorizontal == Direction.left) {
-      _ballX -= 0.02;
-    } else if (_ballDirectionHorizontal == Direction.right) {
-      _ballX += 0.02;
+      _ballX -= 0.01;
+    } else {
+      // right
+      _ballX += 0.01;
     }
   }
 
@@ -131,14 +130,13 @@ class _TableVwState extends State<TableVw> {
   }
 
   void throwBall() async {
-    await Future.delayed(const Duration(seconds: 1));
     setRandomBallDirection();
   }
 
   Timer startGame() {
     throwBall();
 
-    return Timer.periodic(const Duration(milliseconds: 10), (timer) {
+    return Timer.periodic(const Duration(milliseconds: 5), (timer) {
       if (ballPassedRacket()) {
         if (_ballDirectionVertical == Direction.down) {
           setState(() {
@@ -166,8 +164,6 @@ class _TableVwState extends State<TableVw> {
       });
     });
   }
-
-  int veces = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -204,6 +200,7 @@ class _TableVwState extends State<TableVw> {
           },
           child: Stack(
             children: [
+              // Container(alignment: Alignment(0, _racketHeight), color: Colors.red, height: 10),
               ScoreBoard(points: _pointsRacketUp, alignment: const Alignment(-0.8, -0.8), fontSize: 35),
               Racket(x: _racketUpX, y: _racketUpY, width: _racketWidth),
               Ball(x: _ballX, y: _ballY),
