@@ -14,18 +14,52 @@
   <div class="container">
     <div class="row">
       <div class="col-6 mx-auto mt-5">
-        <h1 id="app">{{text}}</h1>
+        <textarea id="chat-log" cols="100" rows="20"></textarea><br>
+        <input id="chat-message-input" type="text" size="100"><br>
+        <input id="chat-message-submit" type="button" value="Send">
+        {{ room_name|json_script:"room-name" }}
       </div>
     </div>
   </div>
 
   <script>
-    var socket = new WebSocket('ws://localhost:8000/ws/some_url/')
-    socket.onmessage = function (e) {
-      var data = JSON.parse(e.data)
-      console.log(data)
-      document.querySelector('#app').innerText = data.message
+    const roomName = JSON.parse(document.getElementById('room-name').textContent); // gets the room name
+    const route = 'ws://' + window.location.host + '/ws/chat/' + roomName + '/';
+    console.log(route);
+    const chatSocket = new WebSocket(route); // creating the Websocket instance we talked about earlier, remember?
+
+    // the event handler for the Websocket event, Open. It opens the Websocket connection
+    chatSocket.onopen = function (e) {
+      console.log("Websocket Connected");
     }
+
+    // the event handler for the Websocket event, Message, it receives the message sent
+    chatSocket.onmessage = function (e) {
+      const data = JSON.parse(e.data);
+      document.querySelector('#chat-log').value += (data.message + '\n');
+    };
+
+    // the event handler for the Websocket event, Close. It shows when the Websocket connection is closed
+    chatSocket.onclose = function (e) {
+      console.error('Chat  socket closed unexpectedly');
+    };
+
+    document.querySelector('#chat-message-input').focus();
+    document.querySelector('#chat-message-input').onkeyup = function (e) {
+      if (e.keyCode === 13) { // enter, return
+        document.querySelector('#chat-message-submit').click();
+      }
+    };
+    document.querySelector('#chat-message-submit').onclick = function (e) {
+      const messageInputDom = document.querySelector('#chat-message-input');
+      const message = messageInputDom.value;
+
+      // this event handler sends the message and tells us that a message was sent
+      chatSocket.send(JSON.stringify({
+        'message': message
+      }));
+      messageInputDom.value = '';
+    };
   </script>
 </body>
 
