@@ -1,0 +1,13 @@
+Multiplayer v1
+
+GAME PROCESS
+1. Both players have status connected.
+2. Any of them can start the game by inviting the other.
+3. The other one should accept the invitation. If the other player does not accept the invitation, just reset the 
+  process for the inviting player.
+4. The game is setup.
+5. Players are notified and the game starts.
+6. Palette and ball movement, points, player state are kept in the server while the game is running. 
+7. The first player that gets 5 points wins.
+8. The game ends if a player wins, if a player withdraws involuntarily (by persistant network failure or any error),
+  or voluntarily (By withdrawal option or app close).
