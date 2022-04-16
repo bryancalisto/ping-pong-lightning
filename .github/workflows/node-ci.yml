@@ -6,10 +6,6 @@ on:
     
 jobs:
   test:
-    defaults:
-      run:
-        working-directory: ./multiplayer
-
     runs-on: ubuntu-latest
 
     strategy:
@@ -24,4 +20,6 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - run: npm ci
+      working-directory: ./multiplayer
     - run: npm test
+      working-directory: ./multiplayer
