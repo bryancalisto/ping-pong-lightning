@@ -3,13 +3,12 @@ name: Node.js CI
 on:
   push:
     branches: [ main ]
-
-defaults:
-  run:
-    working-directory: ./multiplayer
     
 jobs:
-  build:
+  test:
+    defaults:
+      run:
+        working-directory: ./multiplayer
 
     runs-on: ubuntu-latest
 
