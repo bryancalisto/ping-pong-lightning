@@ -1,12 +1,13 @@
-const { server } = require('./server');
-const { generateClient } = require('./client');
+const { Server } = require('./server');
+const { Client } = require('./client');
 
-server.listen(3000);
-const client = generateClient('ws://localhost:3000');
+const server = new Server();
+server.io.listen(3000);
+const client = Client('ws://localhost:3000');
 
-client.emit('hey', 'daaa');
+client.io.emit('hey', 'daaa');
 
 let count = 0;
 setInterval(() => {
-  client.emit('hey', count++);
+  client.io.emit('hey', count++);
 }, 1000);

@@ -1,18 +1,24 @@
-const io = require('socket.io-client');
+const socketio = require('socket.io-client');
+const { events } = require('./events');
 
-const generateClient = (url, configs) => {
-  const client = io(url, {
-    reconnectionDelayMax: 10000,
-    ...configs
-  });
+class Client {
+  id = null;
+  io = null;
 
-  client.on('ev1', (data) => {
-    console.log(data);
-  });
+  constructor(url, configs) {
+    this.io = socketio(url, {
+      reconnectionDelayMax: 10000,
+      ...configs
+    });
 
-  return client;
-};
+    this.id = this.io.id;
+  }
+
+  addListener(event, callback) {
+    this.io.on(event, callback);
+  }
+}
 
 module.exports = {
-  generateClient
+  Client
 };
