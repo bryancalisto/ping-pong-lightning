@@ -4,6 +4,10 @@ on:
   push:
     branches: [ main ]
 
+defaults:
+  run:
+    working-directory: ./multiplayer
+    
 jobs:
   build:
 
@@ -20,6 +24,5 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-        working-directory: ./multiplayer
     - run: npm ci
     - run: npm test
