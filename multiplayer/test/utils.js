@@ -1,6 +1,7 @@
 const generateRandomPort = () => {
-  const ports = Array(100).fill(3000).map((num, i) => num + i); // 3000 - 3099
-  return ports[Math.floor(Math.random() * 100)];
+  const min = 3000;
+  const max = 3999;
+  return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
 module.exports = {
