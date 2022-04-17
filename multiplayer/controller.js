@@ -1,6 +1,6 @@
 const { GameAlreadyRunning, TooManyPlayers } = require('./exceptions');
 const { Player } = require('./models');
-const { startNewGame, addPlayerToGame } = require('./multiplayer');
+const { startNewGame, addPlayerToGame, monitorPlayerConnection } = require('./services');
 const { events } = require('./events');
 
 const processStartNewGame = (client) => {
@@ -16,9 +16,11 @@ const processStartNewGame = (client) => {
 
 const processJoinGame = (client) => {
   try {
-    const newPlayer = new Player(client.id);
+    const newPlayer = new Player(client);
     addPlayerToGame(newPlayer);
     client.emit(events.info.type, events.info.ok);
+    // Keep track of player's connection
+    // newPlayer.connectionMonitorRef = monitorPlayerConnection(client);
   } catch (e) {
     if (e instanceof TooManyPlayers) {
       client.emit(events.error.type, events.error.tooManyPlayers);

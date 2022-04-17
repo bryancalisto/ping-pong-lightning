@@ -15,13 +15,15 @@ class Game {
 }
 
 class Player {
-  id = null;
+  lostPings = 0;
+  connectionMonitorRef = 0;
+  socket = null;
   points = 0;
   online = true;
   playing = false;
 
-  constructor(id) {
-    this.id = id;
+  constructor(socket) {
+    this.socket = socket;
   }
 }
 

@@ -7,7 +7,9 @@ const events = {
   },
   info: {
     type: 'info',
-    ok: 'ok'
+    ok: 'ok',
+    ping: 'ping',
+    pong: 'pong'
   },
   req: {
     type: 'req',

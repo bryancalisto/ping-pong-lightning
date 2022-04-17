@@ -1,6 +1,4 @@
 const socketio = require('socket.io');
-const { processStartNewGame, processJoinGame, badRequest } = require('./controller');
-const { events } = require('./events');
 
 class Server {
   clients = [];
@@ -8,18 +6,20 @@ class Server {
 
   constructor() {
     this.io = socketio();
+  }
 
-    this.io.on('connection', (socket) => {
-      this.clients.push(socket);
+  addListener(event, callback) {
+    if (event === 'connection') { // Override to include incoming socket to clients list
+      const overridenCallback = (socket) => {
+        this.clients.push(socket);
+        callback(socket);
+      };
 
-      socket.on(events.req.startNewGame, (data) => {
-        processStartNewGame(socket);
-      });
+      this.io.on(event, overridenCallback);
+      return;
+    }
 
-      socket.on(events.req.joinGame, (data) => {
-        processJoinGame(socket);
-      });
-    });
+    this.io.on(event, callback);
   }
 
   closeClients() {

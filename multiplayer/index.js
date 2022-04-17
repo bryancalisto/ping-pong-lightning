@@ -1,13 +1,19 @@
 const { Server } = require('./server');
 const { Client } = require('./client');
+const setupServer = require('./serverSetup');
 
 const server = new Server();
-server.io.listen(3000);
-const client = Client('ws://localhost:3000');
+setupServer(server);
 
-client.io.emit('hey', 'daaa');
+server.io.listen(3000);
+
+const client = new Client('ws://localhost:3000');
+
+client.addListener('hello', () => {
+  client.io.emit('world')
+});
 
 let count = 0;
 setInterval(() => {
-  client.io.emit('hey', count++);
-}, 1000);
+  server.io.emit('hello', count++);
+}, 3000);

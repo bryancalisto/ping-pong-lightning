@@ -1,5 +1,4 @@
 const socketio = require('socket.io-client');
-const { events } = require('./events');
 
 class Client {
   id = null;
@@ -7,6 +6,7 @@ class Client {
 
   constructor(url, configs) {
     this.io = socketio(url, {
+      autoConnect: false,
       reconnectionDelayMax: 10000,
       ...configs
     });
@@ -16,6 +16,10 @@ class Client {
 
   addListener(event, callback) {
     this.io.on(event, callback);
+  }
+
+  connect() {
+    this.io.connect();
   }
 }
 
